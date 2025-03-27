@@ -6,6 +6,7 @@ from typing import List
 import nltk
 import pandas as pd
 import sklearn
+import json
 
 # download preprocessing assets (corpus and word lists)
 # NOTE: Due to the new no-internet constraints during runtime, these are actually downloaded beforehand in the `container.yml`

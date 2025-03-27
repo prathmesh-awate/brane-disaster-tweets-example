@@ -29,8 +29,6 @@ def run_dataset_action(cmd: str, filepath: str):
         "tokenize": tokenize,
         "remove_stopwords": remove_stopwords,
         "generate_bigrams": generate_bigrams,
-        "load_csv": load_csv,
-        "filter_data": filter_data,
     }[cmd](filepath)
 
 
@@ -74,7 +72,11 @@ def main():
 
         return
 
-    
+    if command == "load_csv":
+        file_path = sys.argv[2]
+        result = load_csv(file_path)
+        print(result)
+
 
     filepath_in = json.loads(os.environ["FILEPATH"])
     filepath_out = run_dataset_action(command, filepath_in)
