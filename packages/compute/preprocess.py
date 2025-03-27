@@ -271,6 +271,7 @@ def load_csv(dataset_path: str) -> str:
     Load CSV file into a DataFrame.
     """
     try:
+        dataset_path = f"{dataset_path}/dataset.csv"
         df = pd.read_csv(dataset_path)
         return df.to_json(orient='records')
     except Exception as e:
