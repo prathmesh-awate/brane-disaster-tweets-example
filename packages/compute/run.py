@@ -8,7 +8,6 @@ import sys
 import json
 import yaml
 
-from model import create_submission, train_model
 from preprocess import (clean, create_vectors, generate_bigrams,
                         remove_stopwords, tokenize)
 
@@ -72,21 +71,7 @@ def main():
 
         return
 
-    if command == "train_model":
-        filepath_dataset = f"{json.loads(os.environ['FILEPATH_DATASET'])}/dataset.csv"
-        filepath_vectors = f"{json.loads(os.environ['FILEPATH_VECTORS'])}/train_vectors.pickle"
-        filepath_model = train_model(filepath_dataset, filepath_vectors)
-        # print_output({"filepath_model": filepath_model})
-        return
-
-    if command == "create_submission":
-        filepath_dataset = f"{json.loads(os.environ['FILEPATH_DATASET'])}/dataset.csv"
-        filepath_vectors = f"{json.loads(os.environ['FILEPATH_VECTORS'])}/test_vectors.pickle"
-        filepath_model = f"{json.loads(os.environ['FILEPATH_MODEL'])}/model.pickle"
-        filepath_submission = create_submission(
-            filepath_dataset, filepath_vectors, filepath_model)
-        # print_output({"filepath_submission": filepath_submission})
-        return
+    
 
     filepath_in = json.loads(os.environ["FILEPATH"])
     filepath_out = run_dataset_action(command, filepath_in)

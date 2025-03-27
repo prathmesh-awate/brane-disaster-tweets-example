@@ -24,7 +24,6 @@ files:
   - Pipfile.lock
   - __init__.py
   - run.py
-  - model.py 
   - preprocess.py
 
 unpack:
@@ -85,36 +84,6 @@ actions:
     output:
       - type: IntermediateResult
         name: vectors
-
-  'train_model':
-    command:
-      capture: marked
-      args:
-        - train_model
-    input:
-      - type: IntermediateResult
-        name: filepath_dataset
-      - type: IntermediateResult
-        name: filepath_vectors
-    output:
-      - type: IntermediateResult
-        name: filepath_model
-
-  'create_submission':
-    command:
-      capture: marked
-      args:
-        - create_submission
-    input:
-      - type: IntermediateResult
-        name: filepath_dataset
-      - type: IntermediateResult
-        name: filepath_vectors
-      - type: IntermediateResult
-        name: filepath_model
-    output:
-      - type: IntermediateResult
-        name: filepath_submission
 
   'generate_bigrams':
     command:
