@@ -73,7 +73,7 @@ def main():
         return
 
     if command == "load_csv":
-        file_path = os.environ["FILEPATH"]
+        file_path = f"{json.loads(os.environ['TRAIN_SET'])}/dataset.csv"
         result = load_csv(file_path)
         print(result)
 

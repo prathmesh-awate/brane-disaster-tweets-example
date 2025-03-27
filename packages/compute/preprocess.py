@@ -266,12 +266,12 @@ def generate_bigrams(dataset_path: str) -> str:
 #     return pd.read_csv(file_path)
 
 
-def load_csv(file_path):
+def load_csv(dataset_path: str) -> str:
     """
     Load CSV file into a DataFrame.
     """
     try:
-        df = pd.read_csv(file_path)
+        df = pd.read_csv(dataset_path)
         return df.to_json(orient='records')
     except Exception as e:
         return json.dumps({"error": str(e)})
