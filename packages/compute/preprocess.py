@@ -14,7 +14,6 @@ nltk.download('wordnet')
 nltk.download('omw-1.4')
 
 
-
 def clean(dataset_path: str) -> str:
     """
     Applies regex-based text cleaning to the 'text' column
@@ -58,7 +57,6 @@ def clean(dataset_path: str) -> str:
     df.to_csv(new_path)
     return new_path
 
-
 def tokenize(dataset_path: str) -> str:
     """
     Creates an additional columns 'tokens' to the dataset.
@@ -94,7 +92,6 @@ def tokenize(dataset_path: str) -> str:
         nltk.tokenize.RegexpTokenizer(r'\w+').tokenize)
     df.to_csv(new_path)
     return new_path
-
 
 def remove_stopwords(dataset_path: str) -> str:
     """
@@ -138,7 +135,6 @@ def remove_stopwords(dataset_path: str) -> str:
     df["tokens"] = df["tokens"].apply(_rm_stopwords)
     df.to_csv(new_path)
     return new_path
-
 
 def create_vectors(
     dataset_path_train: str, dataset_path_test: str,
@@ -205,7 +201,6 @@ def create_vectors(
         pickle.dump(vectors_test, f)
 
     return 0
-
 
 def generate_bigrams(dataset_path: str) -> str:
     """

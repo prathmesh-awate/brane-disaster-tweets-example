@@ -48,6 +48,7 @@ def print_output(data: dict):
 
 
 def main():
+    #this your 
     command = sys.argv[1]
 
     if command == "create_vectors":
