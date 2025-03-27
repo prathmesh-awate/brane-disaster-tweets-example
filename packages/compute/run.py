@@ -73,10 +73,11 @@ def main():
         return
 
     if command == "load_csv":
+        print("HELELO")
         file_path = f"{json.loads(os.environ['TRAIN_SET'])}/dataset.csv"
         result = load_csv(file_path)
         print(result)
-
+        return
 
     filepath_in = json.loads(os.environ["FILEPATH"])
     filepath_out = run_dataset_action(command, filepath_in)
