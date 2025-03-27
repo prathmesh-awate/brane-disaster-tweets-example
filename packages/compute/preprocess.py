@@ -248,21 +248,33 @@ def generate_bigrams(dataset_path: str) -> str:
     return new_path
 
 
-def load_csv(file_path: str) -> pd.DataFrame:
-    """
-    Loads a CSV file into a pandas DataFrame.
+# def load_csv(file_path: str) -> pd.DataFrame:
+#     """
+#     Loads a CSV file into a pandas DataFrame.
     
-    Parameters
-    ----------
-    file_path: str
-        The path to the CSV file.
+#     Parameters
+#     ----------
+#     file_path: str
+#         The path to the CSV file.
 
-    Returns
-    -------
-    pd.DataFrame
-        The loaded DataFrame.
+#     Returns
+#     -------
+#     pd.DataFrame
+#         The loaded DataFrame.
+#     """
+#     return pd.read_csv(file_path)
+
+
+def load_csv(file_path):
     """
-    return pd.read_csv(file_path)
+    Load CSV file into a DataFrame.
+    """
+    try:
+        df = pd.read_csv(file_path)
+        return df.to_json(orient='records')
+    except Exception as e:
+        return json.dumps({"error": str(e)})
+
 
 def filter_data(dataframe: pd.DataFrame, column: str, threshold: float) -> pd.DataFrame:
     """

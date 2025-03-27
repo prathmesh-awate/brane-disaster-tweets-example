@@ -107,5 +107,6 @@ actions:
         name: filepath
     output:
       - type: IntermediateResult
-        name: filepath
+        name: dataframe_json
+
 
