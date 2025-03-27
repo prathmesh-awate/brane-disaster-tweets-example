@@ -73,7 +73,7 @@ def main():
         return
 
     if command == "load_csv":
-        file_path = sys.argv[2]
+        file_path = os.environ["FILEPATH"]
         result = load_csv(file_path)
         print(result)
 
