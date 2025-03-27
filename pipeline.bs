@@ -63,9 +63,8 @@ import visualization;
     // commit_result("keyword_plot", keyword_plot);
 
     println("load_csv");
-
-    //let loaded_data := load_csv(new Data{ name := "nlp_train" });
-    train := load_csv(train);
+    let loaded_data := load_csv(new Data{ name := "nlp_train" });
+    //train := load_csv(train);
    //println(loaded_data)
    
 

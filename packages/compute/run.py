@@ -50,7 +50,7 @@ def print_output(data: dict):
 def main():
     #this your 
     command = sys.argv[1]
-
+    print(command)
     if command == "create_vectors":
         # filepath_train_dataset = os.environ["FILEPATH_TRAIN_DATASET"]
         # filepath_test_dataset = os.environ["FILEPATH_TEST_DATASET"]
@@ -74,9 +74,9 @@ def main():
 
     if command == "load_csv":
         print("HELELO")
-        file_path = f"{json.loads(os.environ['TRAIN_SET'])}/dataset.csv"
-        result = load_csv(file_path)
-        print(result)
+        train_dataset = f"{json.loads(os.environ['TRAIN_SET'])}/dataset.csv"
+        result = load_csv(train_dataset)
+        if result != 0: print(f"Uh-oh, 'create_vectors' returned non-zero exit code '{errcode}'", file=sys.stderr); exit(1)
         return
 
     filepath_in = json.loads(os.environ["FILEPATH"])
