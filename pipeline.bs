@@ -64,9 +64,9 @@ import visualization;
 
     println("load_csv");
 
-    let loaded_data := load_csv(new Data{ name := "nlp_train" });
-    println(loaded_data)
-
+    //let loaded_data := load_csv(new Data{ name := "nlp_train" });
+    train := load_csv(train);
+   //println(loaded_data)
    
 
 }
