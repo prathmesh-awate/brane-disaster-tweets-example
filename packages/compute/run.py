@@ -4,13 +4,13 @@ Entrypoint for the compute package.
 '''
 import os
 import sys
-import argparse
+
 import json
 import yaml
 
 from model import create_submission, train_model
-from preprocess import (filter_dataframe, group_and_aggregate, analyze_column,
-                        handle_missing_values, combine_dataframes)
+from preprocess import (clean, create_vectors, generate_bigrams,
+                        remove_stopwords, tokenize)
 
 
 def run_dataset_action(cmd: str, filepath: str):
@@ -26,11 +26,10 @@ def run_dataset_action(cmd: str, filepath: str):
     The dataset filepath in the DFS.
     """
     return {
-    "filter_dataframe": filter_dataframe,
-    "group_and_aggregate": group_and_aggregate,
-    "analyze_column": analyze_column,
-    "handle_missing_values": handle_missing_values,
-    "combine_dataframes": combine_dataframes,
+        "clean": clean,
+        "tokenize": tokenize,
+        "remove_stopwords": remove_stopwords,
+        "generate_bigrams": generate_bigrams,
     }[cmd](filepath)
 
 
@@ -50,52 +49,49 @@ def print_output(data: dict):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Dataset Processing Script")
+    command = sys.argv[1]
 
-    parser.add_argument("cmd", type=str, choices=[
-        "filter_dataframe",
-        "group_and_aggregate",
-        "analyze_column",
-        "handle_missing_values",
-        "combine_dataframes"
-    ], help="Command to execute")
+    if command == "create_vectors":
+        # filepath_train_dataset = os.environ["FILEPATH_TRAIN_DATASET"]
+        # filepath_test_dataset = os.environ["FILEPATH_TEST_DATASET"]
+        # filepath_train_vectors = os.environ["FILEPATH_TRAIN_VECTORS"]
+        # filepath_test_vectors = os.environ["FILEPATH_TEST_VECTORS"]
+        # errcode = create_vectors(filepath_train_dataset, filepath_test_dataset,
+        #                          filepath_train_vectors, filepath_test_vectors)
+        # print_output({"errcode": errcode})
 
-    parser.add_argument("--dataset_path", type=str, required=True, help="Path to the dataset")
+        # Find the input paths to the training & test dataset
+        train_dataset = f"{json.loads(os.environ['TRAIN_SET'])}/dataset.csv"
+        test_dataset = f"{json.loads(os.environ['TEST_SET'])}/dataset.csv"
+        # Generate the path for the vectors
+        train_vectors = "/result/train_vectors.pickle"
+        test_vectors = "/result/test_vectors.pickle"
+        # Call the function
+        errcode = create_vectors(train_dataset, test_dataset, train_vectors, test_vectors)
+        if errcode != 0: print(f"Uh-oh, 'create_vectors' returned non-zero exit code '{errcode}'", file=sys.stderr); exit(1)
 
-    # Optional arguments for specific commands
-    parser.add_argument("--column", type=str, help="Column name for filtering, analyzing, or missing value handling")
-    parser.add_argument("--condition", type=str, help="Condition for filtering (should be a lambda expression as string)")
-    parser.add_argument("--group_by_column", type=str, help="Column to group by for aggregation")
-    parser.add_argument("--agg_column", type=str, help="Column to aggregate")
-    parser.add_argument("--agg_func", type=str, choices=["sum", "mean", "count", "max", "min"], help="Aggregation function")
-    parser.add_argument("--method", type=str, choices=["drop", "fill"], help="Method to handle missing values")
-    parser.add_argument("--fill_value", type=str, help="Value to fill missing data")
-    parser.add_argument("--dataset_path_2", type=str, help="Second dataset path for merging")
-    parser.add_argument("--on_column", type=str, help="Column to merge on")
-    parser.add_argument("--how", type=str, choices=["inner", "outer", "left", "right"], default="inner", help="Merge type")
+        return
 
-    args = parser.parse_args()
+    if command == "train_model":
+        filepath_dataset = f"{json.loads(os.environ['FILEPATH_DATASET'])}/dataset.csv"
+        filepath_vectors = f"{json.loads(os.environ['FILEPATH_VECTORS'])}/train_vectors.pickle"
+        filepath_model = train_model(filepath_dataset, filepath_vectors)
+        # print_output({"filepath_model": filepath_model})
+        return
 
+    if command == "create_submission":
+        filepath_dataset = f"{json.loads(os.environ['FILEPATH_DATASET'])}/dataset.csv"
+        filepath_vectors = f"{json.loads(os.environ['FILEPATH_VECTORS'])}/test_vectors.pickle"
+        filepath_model = f"{json.loads(os.environ['FILEPATH_MODEL'])}/model.pickle"
+        filepath_submission = create_submission(
+            filepath_dataset, filepath_vectors, filepath_model)
+        # print_output({"filepath_submission": filepath_submission})
+        return
 
-    # Execute the appropriate function
-    if args.cmd == "filter_dataframe":
-        condition_func = eval(args.condition) if args.condition else lambda x: True
-        result_path = filter_dataframe(args.dataset_path, args.column, condition_func)
-    
-    elif args.cmd == "group_and_aggregate":
-        result_path = group_and_aggregate(args.dataset_path, args.group_by_column, args.agg_column, args.agg_func)
-    
-    elif args.cmd == "analyze_column":
-        result_path = analyze_column(args.dataset_path, args.column)
-    
-    elif args.cmd == "handle_missing_values":
-        fill_value = eval(args.fill_value) if args.fill_value else None
-        result_path = handle_missing_values(args.dataset_path, args.method, fill_value)
-    
-    elif args.cmd == "combine_dataframes":
-        result_path = combine_dataframes(args.dataset_path, args.dataset_path_2, args.on_column, args.how)
+    filepath_in = json.loads(os.environ["FILEPATH"])
+    filepath_out = run_dataset_action(command, filepath_in)
+    # print_output({"filepath": filepath_out})
 
-    print(f"Processed dataset saved at: {result_path}")
 
 if __name__ == '__main__':
     main()

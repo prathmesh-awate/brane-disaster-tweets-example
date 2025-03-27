@@ -1,137 +1,252 @@
+import ast
+import pickle
+import re
+from typing import List
+
+import nltk
 import pandas as pd
+import sklearn
 
-def filter_dataframe(dataset_path: str, column: str, condition) -> str:
+# download preprocessing assets (corpus and word lists)
+# NOTE: Due to the new no-internet constraints during runtime, these are actually downloaded beforehand in the `container.yml`
+nltk.download('stopwords')
+nltk.download('wordnet')
+nltk.download('omw-1.4')
+
+
+def clean(dataset_path: str) -> str:
     """
-    Filters a DataFrame based on a given condition.
+    Applies regex-based text cleaning to the 'text' column
+    for every dataset row.
 
     Parameters
     ----------
     dataset_path: `str`
-        Path to the dataset.
-    column: `str`
-        Column name to filter on.
-    condition:
-        A lambda function or value to filter the column.
+    The dataset CSV/TSV path in the distributed file system.
+    It expects a dataset with a 'text' column which contains strings.
 
     Returns
     -------
-    `str` The path of the filtered dataset.
+    `str` The path for the clean version of the dataset in the DFS.
     """
-    df = pd.read_csv(dataset_path)
-    df_filtered = df[df[column].apply(condition)]
-    new_path = "/result/filtered_dataset.csv"
-    df_filtered.to_csv(new_path, index=False)
+    def _remove_unused(text: str):
+        clean_data = text.lower().strip()
+        clean_data = re.sub(
+            r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+',
+            " ", clean_data)
+        clean_data = re.sub(r"<.*>", "", clean_data)
+        clean_data = re.sub(r"@[a-zA-Z0-9_]+", "", clean_data)
+        clean_data = clean_data.replace("\n", "")\
+            .replace("#", "")
+        return clean_data
+
+    dtypes = {
+        "id": int,
+        "keyword": str,
+        "location": str,
+        "text": str
+    }
+
+    dataset_path = f"{dataset_path}/dataset.csv"
+    if "train" in dataset_path:
+        dtypes["target"] = int
+
+    new_path = "/result/dataset.csv"
+    df = pd.read_csv(dataset_path, index_col="id", dtype=dtypes)
+    df["text"] = df["text"].apply(_remove_unused)
+    df.to_csv(new_path)
     return new_path
 
 
-def group_and_aggregate(dataset_path: str, group_by_column: str, agg_column: str, agg_func: str) -> str:
+def tokenize(dataset_path: str) -> str:
     """
-    Groups a DataFrame by a column and aggregates another column.
+    Creates an additional columns 'tokens' to the dataset.
+    It contains a list of stemmed and lemmatized tokens.
 
     Parameters
     ----------
     dataset_path: `str`
-        Path to the dataset.
-    group_by_column: `str`
-        The column to group by.
-    agg_column: `str`
-        The column to apply the aggregation function on.
-    agg_func: `str`
-        The aggregation function ('sum', 'mean', 'count', etc.).
+    The dataset CSV/TSV path in the distributed file system.
+    It expects a dataset with a 'text' column which contains strings.
 
     Returns
     -------
-    `str` The path of the grouped and aggregated dataset.
+    `str` The path for the tokenized version of the dataset in the DFS.
     """
-    df = pd.read_csv(dataset_path)
-    df_grouped = df.groupby(group_by_column)[agg_column].agg(agg_func).reset_index()
-    new_path = "/result/grouped_dataset.csv"
-    df_grouped.to_csv(new_path, index=False)
+    dtypes = {
+        "id": int,
+        "keyword": str,
+        "location": str,
+        "text": str
+    }
+
+    dataset_path = f"{dataset_path}/dataset.csv"
+    if "train" in dataset_path:
+        dtypes["target"] = int
+
+    new_path = "/result/dataset.csv"
+    df = pd.read_csv(dataset_path, index_col="id", dtype=dtypes)
+    df["text_stemmed"] = df["text"].apply(nltk.stem.PorterStemmer().stem)
+    df["text_lemmatized"] = df["text_stemmed"].apply(
+        nltk.stem.WordNetLemmatizer().lemmatize)
+    df["tokens"] = df["text_lemmatized"].apply(
+        nltk.tokenize.RegexpTokenizer(r'\w+').tokenize)
+    df.to_csv(new_path)
     return new_path
 
 
-def analyze_column(dataset_path: str, column: str) -> str:
+def remove_stopwords(dataset_path: str) -> str:
     """
-    Analyzes a column by providing summary statistics.
+    Applies stopwords removal to the 'tokens' colums
+    for each dataset row.
 
     Parameters
     ----------
     dataset_path: `str`
-        Path to the dataset.
-    column: `str`
-        The column to analyze.
+    The dataset CSV/TSV path in the distributed file system.
+    It expects a dataset with a 'tokens' column which contains
+    a list of strings.
 
     Returns
     -------
-    `str` The path of the analyzed column output.
+    `str` The path for the new version of the dataset in the DFS.
     """
-    df = pd.read_csv(dataset_path)
-    summary = df[column].describe().to_dict()
-    unique_values = df[column].nunique()
+    dtypes = {
+        "id": int,
+        "keyword": str,
+        "location": str,
+        "text": str,
+        "text_stemmed": str,
+        "text_lemmatized": str,
+    }
 
-    result = {"summary_statistics": summary, "unique_value_count": unique_values}
-    
-    # Saving as JSON
-    new_path = "/result/column_analysis.json"
-    with open(new_path, "w") as f:
-        json.dump(result, f)
+    dataset_path = f"{dataset_path}/dataset.csv"
+    if "train" in dataset_path:
+        dtypes["target"] = int
 
+    def _rm_stopwords(tokens: List[str]):
+        return [w for w in tokens
+                if w not in nltk.corpus.stopwords.words('english')]
+
+    new_path = "/result/dataset.csv"
+    df = pd.read_csv(
+        dataset_path,
+        index_col="id",
+        dtype=dtypes,
+        converters={"tokens": ast.literal_eval})
+    df["tokens"] = df["tokens"].apply(_rm_stopwords)
+    df.to_csv(new_path)
     return new_path
 
 
-def handle_missing_values(dataset_path: str, method: str = "drop", fill_value=None) -> str:
+def create_vectors(
+    dataset_path_train: str, dataset_path_test: str,
+    vectors_path_train: str, vectors_path_test: str
+) -> int:
     """
-    Handles missing values in the dataset.
+    Converts the raw dataset tweets to token-count vectors. The
+    dictionary used for the frequencies is based on the training data.
+
+    Parameters
+    ----------
+    dataset_path_train: `str`
+    The preprocessed training dataset CSV/TSV path in the distributed
+    file system.
+
+    dataset_path_test: `str`
+    The preprocessed testing dataset CSV/TSV path in the distributed
+    file system.
+
+    vectors_path_train: `str`
+    The final location for training vectors in the distributed
+    file system where the binary file will be stored.
+
+    vectors_path_test: `str`
+    The final location for testing vectors in the distributed
+    file system where the binary file will be stored.
+
+    Returns
+    -------
+    `int` Error code (success = 0, failure >= 1)
+    """
+    dtypes = {
+        "id": int,
+        "keyword": str,
+        "location": str,
+        "text": str,
+        "text_stemmed": str,
+        "text_lemmatized": str,
+    }
+
+    df_train = pd.read_csv(
+        dataset_path_train,
+        index_col="id",
+        dtype={**dtypes, "target": int},
+        converters={"tokens": ast.literal_eval})
+    df_train["text_preprocessed"] = df_train["tokens"].apply(
+        lambda x: " ".join(x))
+
+    df_test = pd.read_csv(
+        dataset_path_test,
+        index_col="id",
+        dtype=dtypes,
+        converters={"tokens": ast.literal_eval})
+    df_test["text_preprocessed"] = df_test["tokens"].apply(
+        lambda x: " ".join(x))
+
+    vectorizer = sklearn.feature_extraction.text.CountVectorizer()
+    vectors_train = vectorizer.fit_transform(df_train["text_preprocessed"])
+    vectors_test = vectorizer.transform(df_test["text_preprocessed"])
+
+    with open(vectors_path_train, "wb") as f:
+        pickle.dump(vectors_train, f)
+    with open(vectors_path_test, "wb") as f:
+        pickle.dump(vectors_test, f)
+
+    return 0
+
+
+def generate_bigrams(dataset_path: str) -> str:
+    """
+    Generates bi-gram information for each tweet.
 
     Parameters
     ----------
     dataset_path: `str`
-        Path to the dataset.
-    method: `str`
-        Method to handle missing values: "drop" to remove rows, "fill" to replace with `fill_value`.
-    fill_value: `any`
-        Value to replace NaNs if using the "fill" method.
+    The dataset CSV/TSV path in the distributed file system.
+    It expects a dataset with a 'text' column which contains strings.
 
     Returns
     -------
-    `str` The path of the dataset with missing values handled.
+    `str`
+    The path for the new version of the dataset (with bigrams) in the DFS.
     """
-    df = pd.read_csv(dataset_path)
+    dtypes = {
+        "id": int,
+        "keyword": str,
+        "location": str,
+        "text": str,
+    }
 
-    if method == "drop":
-        df = df.dropna()
-    elif method == "fill" and fill_value is not None:
-        df = df.fillna(fill_value)
+    dataset_path = f"{dataset_path}/dataset.csv"
+    if "train" in dataset_path:
+        dtypes["target"] = int
 
-    new_path = "/result/cleaned_dataset.csv"
-    df.to_csv(new_path, index=False)
-    return new_path
+    def _make_string_bigrams(tokens: List[str]) -> List[str]:
+        bigrams = list(nltk.bigrams(tokens))
+        out: List[str] = []
+        for b in bigrams:
+            out.append(f"{b[0]}_{b[1]}")
+        return out
 
+    new_path = "/result/dataset.csv"
+    df = pd.read_csv(
+        dataset_path,
+        index_col="id",
+        dtype=dtypes,
+        converters={"tokens": ast.literal_eval})
 
-def combine_dataframes(dataset_path_1: str, dataset_path_2: str, on_column: str, how: str = "inner") -> str:
-    """
-    Merges two DataFrames on a common column.
+    df["bigrams"] = df["tokens"].apply(_make_string_bigrams)
+    df.to_csv(new_path)
 
-    Parameters
-    ----------
-    dataset_path_1: `str`
-        Path to the first dataset.
-    dataset_path_2: `str`
-        Path to the second dataset.
-    on_column: `str`
-        The common column to merge on.
-    how: `str`
-        Merge type: "inner", "outer", "left", "right".
-
-    Returns
-    -------
-    `str` The path of the merged dataset.
-    """
-    df1 = pd.read_csv(dataset_path_1)
-    df2 = pd.read_csv(dataset_path_2)
-
-    df_merged = df1.merge(df2, on=on_column, how=how)
-    
-    new_path = "/result/merged_dataset.csv"
-    df_merged.to_csv(new_path, index=False)
     return new_path
