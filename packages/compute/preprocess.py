@@ -246,3 +246,42 @@ def generate_bigrams(dataset_path: str) -> str:
     df.to_csv(new_path)
 
     return new_path
+
+
+def load_csv(file_path: str) -> pd.DataFrame:
+    """
+    Loads a CSV file into a pandas DataFrame.
+    
+    Parameters
+    ----------
+    file_path: str
+        The path to the CSV file.
+
+    Returns
+    -------
+    pd.DataFrame
+        The loaded DataFrame.
+    """
+    return pd.read_csv(file_path)
+
+def filter_data(dataframe: pd.DataFrame, column: str, threshold: float) -> pd.DataFrame:
+    """
+    Filters the DataFrame based on a column value exceeding a given threshold.
+    
+    Parameters
+    ----------
+    dataframe: pd.DataFrame
+        The input DataFrame.
+    column: str
+        The column to apply the filter on.
+    threshold: float
+        The threshold value.
+    
+    Returns
+    -------
+    pd.DataFrame
+        The filtered DataFrame.
+    """
+    return dataframe[dataframe[column] > threshold]
+
+

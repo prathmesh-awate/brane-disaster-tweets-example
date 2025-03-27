@@ -96,3 +96,16 @@ actions:
     output:
       - type: IntermediateResult
         name: filepath
+
+  'load_csv':
+    command:
+      capture: marked
+      args:
+        - load_csv
+    input:
+      - type: IntermediateResult
+        name: filepath
+    output:
+      - type: IntermediateResult
+        name: filepath
+

@@ -9,7 +9,7 @@ import json
 import yaml
 
 from preprocess import (clean, create_vectors, generate_bigrams,
-                        remove_stopwords, tokenize)
+                        remove_stopwords, tokenize, load_csv, filter_data)
 
 
 def run_dataset_action(cmd: str, filepath: str):
@@ -29,6 +29,8 @@ def run_dataset_action(cmd: str, filepath: str):
         "tokenize": tokenize,
         "remove_stopwords": remove_stopwords,
         "generate_bigrams": generate_bigrams,
+        "load_csv": load_csv,
+        "filter_data": filter_data,
     }[cmd](filepath)
 
 
