@@ -7,7 +7,6 @@
 // Specifically, carries the result of functions in the IntermediateResults as variables.
 //
 
-
 import compute;
 import visualization;
 
@@ -15,7 +14,7 @@ import visualization;
 // Change this location according to your instance
 #[on("localhost")]
 {
-    //////// TRAINING ////////
+    //////// PREPROCESSING ////////
     println("Cleaning dataset...");
     let train_clean := clean(new Data{ name := "nlp_train" });
     let test_clean  := clean(new Data{ name := "nlp_test" });
@@ -31,10 +30,6 @@ import visualization;
     println("Performing feature vectorization...");
     let vectors := create_vectors(train, test);
 
-    println("Training model...");
-    let model := train_model(train, vectors);
-    commit_result("nlp_model", model);
-
 
 
     //////// TESTING ////////
@@ -42,9 +37,9 @@ import visualization;
     train := generate_bigrams(train);
     test  := generate_bigrams(test);
 
-    println("Classying tweets...");
+    println("Classifying tweets...");
     // This is called a submission, because it's for a Kaggle challenge - but it's just a set of classifications.
-    let submission := create_submission(test, vectors, model);
+   // let submission := create_submission(test, vectors);
 
     // let n_top_bigrams := 15;
     // print("Plotting bigrams (top "); print(n_top_bigrams); println(")...");
@@ -67,11 +62,13 @@ import visualization;
     // let keyword_plot := generate_keywords_profile(train, 15);
     // commit_result("keyword_plot", keyword_plot);
 
-    println("Generating interactive plot...");
-    let plot := visualization_action(
-        train,
-        test,
-        submission
-    );
-    return commit_result("plot_interface", plot);
+    println("load_csv");
+
+    let loaded_data := load_csv(new Data{ name := "nlp_train" });
+    println(loaded_data)
+
+   
+
 }
+
+       
