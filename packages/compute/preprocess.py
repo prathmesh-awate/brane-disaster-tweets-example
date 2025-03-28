@@ -249,53 +249,27 @@ def generate_bigrams(dataset_path: str) -> str:
     return new_path
 
 
-# def load_csv(file_path: str) -> pd.DataFrame:
-#     """
-#     Loads a CSV file into a pandas DataFrame.
-    
-#     Parameters
-#     ----------
-#     file_path: str
-#         The path to the CSV file.
-
-#     Returns
-#     -------
-#     pd.DataFrame
-#         The loaded DataFrame.
-#     """
-#     return pd.read_csv(file_path)
-
-
-def load_csv(dataset_path: str) -> str:
+def filter_dataframe(dataset_path: str) -> str:
     """
-    Load CSV file into a DataFrame.
-    """
-    try:
-        dataset_path = f"{dataset_path}/dataset.csv"
-        df = pd.read_csv(dataset_path)
-        return df.to_json(orient='records')
-    except Exception as e:
-        return json.dumps({"error": str(e)})
+    Filters rows where median_income > 5 in the given dataset.
 
-
-def filter_data(dataframe: pd.DataFrame, column: str, threshold: float) -> pd.DataFrame:
-    """
-    Filters the DataFrame based on a column value exceeding a given threshold.
-    
     Parameters
     ----------
-    dataframe: pd.DataFrame
-        The input DataFrame.
-    column: str
-        The column to apply the filter on.
-    threshold: float
-        The threshold value.
-    
+    dataset_path: `str`
+        The path to the dataset CSV file.
+
     Returns
     -------
-    pd.DataFrame
-        The filtered DataFrame.
+    `str` The path to the filtered version of the dataset.
     """
-    return dataframe[dataframe[column] > threshold]
+    # Load the dataset
+    df = pd.read_csv(dataset_path)
 
+    # Apply filtering
+    filtered_df = df[df['median_income'] > 5]
 
+    # Save the filtered dataset to a new file
+    filtered_path = "/result/filtered_dataset.csv"
+    filtered_df.to_csv(filtered_path)
+
+    return filtered_path

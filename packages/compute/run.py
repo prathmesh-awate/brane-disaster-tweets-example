@@ -9,7 +9,7 @@ import json
 import yaml
 
 from preprocess import (clean1, create_vectors, generate_bigrams,
-                        remove_stopwords, tokenize, load_csv, filter_data)
+                        remove_stopwords, tokenize, load_csv, filter_dataframe)
 
 
 def run_dataset_action(cmd: str, filepath: str):
@@ -25,10 +25,11 @@ def run_dataset_action(cmd: str, filepath: str):
     The dataset filepath in the DFS.
     """
     return {
-        "clean": clean1,
+        "clean1": clean1,
         "tokenize": tokenize,
         "remove_stopwords": remove_stopwords,
         "generate_bigrams": generate_bigrams,
+        "filter_dataframe": filter_dataframe,
     }[cmd](filepath)
 
 

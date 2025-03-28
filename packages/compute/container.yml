@@ -35,7 +35,7 @@ entrypoint:
   exec: run.py
 
 actions:
-  'clean':
+  'clean1':
     command:
       capture: marked
       args:
@@ -97,16 +97,14 @@ actions:
       - type: IntermediateResult
         name: filepath
 
-  'load_csv':
+  'filter_dataframe':
     command:
       capture: marked
       args:
-        - load_csv
+        - filter_dataframe
     input:
       - type: IntermediateResult
         name: filepath
     output:
       - type: IntermediateResult
-        name: dataframe_json
-
-
+        name: filepath

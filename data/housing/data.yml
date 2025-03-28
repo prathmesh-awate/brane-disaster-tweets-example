@@ -1,0 +1,10 @@
+
+# Set some metadata for this dataset
+name: housing_cali
+owners:
+- xyz
+description: Dataset for California Housing Market.
+
+# This is the real magic: we tell Brane we mean this file
+access: !file
+  path: ./data
