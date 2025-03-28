@@ -14,16 +14,15 @@ import visualization;
 // Change this location according to your instance
 #[on("localhost")]
 {
+    //////// PREPROCESSING ////////
+    println("Cleaning dataset...");
+    let train_clean := clean1(new Data{ name := "nlp_train" });
+    // let test_clean  := clean(new Data{ name := "nlp_test" });
+
     //////// filter_dataframe ////////
     println("filter_dataframe...");
     let cali_filter := filter_dataframe(new Data{ name := "housing_cali" });
     // let test_clean  := clean(new Data{ name := "nlp_test" });
-
-    //////// PREPROCESSING ////////
-    // println("Cleaning dataset...");
-    // let train_clean := clean1(new Data{ name := "nlp_train" });
-    // let test_clean  := clean(new Data{ name := "nlp_test" });
-
 
 }
 

@@ -9,7 +9,7 @@ import json
 import yaml
 
 from preprocess import (clean1, create_vectors, generate_bigrams,
-                        remove_stopwords, tokenize, load_csv, filter_dataframe)
+                        remove_stopwords, tokenize, filter_dataframe)
 
 
 def run_dataset_action(cmd: str, filepath: str):
