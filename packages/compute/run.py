@@ -73,14 +73,8 @@ def main():
 
         return
 
-    if command == "load_csv":
-        print("HELELO")
-        train_dataset = f"{json.loads(os.environ['TRAIN_SET'])}/dataset.csv"
-        result = load_csv(train_dataset)
-        if result != 0: print(f"Uh-oh, 'create_vectors' returned non-zero exit code '{errcode}'", file=sys.stderr); exit(1)
-        return
-
     filepath_in = json.loads(os.environ["FILEPATH"])
+    print("filepath_in: ", filepath_in)
     filepath_out = run_dataset_action(command, filepath_in)
     # print_output({"filepath": filepath_out})
 
