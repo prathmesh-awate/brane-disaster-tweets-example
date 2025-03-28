@@ -35,7 +35,7 @@ entrypoint:
   exec: run.py
 
 actions:
-  'clean1':
+  'clean':
     command:
       capture: marked
       args:
