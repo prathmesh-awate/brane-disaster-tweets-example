@@ -10,9 +10,9 @@ import json
 
 # download preprocessing assets (corpus and word lists)
 # NOTE: Due to the new no-internet constraints during runtime, these are actually downloaded beforehand in the `container.yml`
-nltk.download('stopwords')
-nltk.download('wordnet')
-nltk.download('omw-1.4')
+# nltk.download('stopwords')
+# nltk.download('wordnet')
+# nltk.download('omw-1.4')
 
 
 def clean1(dataset_path: str) -> str:
