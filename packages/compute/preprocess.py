@@ -270,7 +270,7 @@ def filter_dataframe(dataset_path: str) -> str:
     filtered_df = df[df['median_income'] > 5]
 
     # Save the filtered dataset to a new file
-    filtered_path = f"{dataset_path}/filtered_dataset.csv"
+    filtered_path = "/result/filtered_dataset.csv"
     filtered_df.to_csv(filtered_path)
     
     return filtered_path
