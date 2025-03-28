@@ -15,8 +15,8 @@ import visualization;
 #[on("localhost")]
 {
     //////// PREPROCESSING ////////
-    println("Cleaning dataset...");
-    let train_clean := clean(new Data{ name := "nlp_train" });
+    // println("Cleaning dataset...");
+    // let train_clean := clean(new Data{ name := "nlp_train" });
     // let test_clean  := clean(new Data{ name := "nlp_test" });
 
     //////// filter_dataframe ////////
@@ -24,6 +24,21 @@ import visualization;
     let cali_filter := filter_dataframe(new Data{ name := "housing_cali" });
     // let test_clean  := clean(new Data{ name := "nlp_test" });
 
+    //////// group_and_aggregate ////////
+    println("group_and_aggregate...");
+    let cali_group_and_aggregate := group_and_aggregate(new Data{ name := "housing_cali" });
+
+    //////// analyze_column ////////
+    println("analyze_column...");
+    let cali_analyze_column := analyze_column(new Data{ name := "housing_cali" });
+
+    //////// handle_missing_values ////////
+    println("handle_missing_values...");
+    let cali_handle_missing_values := handle_missing_values(new Data{ name := "housing_cali" });
+
+    //////// combine_dataframes ////////
+    println("combine_dataframes...");
+    let cali_combine_dataframes := combine_dataframes(new Data{ name := "housing_cali" });
 }
 
        

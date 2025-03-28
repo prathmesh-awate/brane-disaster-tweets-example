@@ -108,3 +108,51 @@ actions:
     output:
       - type: IntermediateResult
         name: filepath
+
+  'group_and_aggregate':
+    command:
+      capture: marked
+      args:
+        - group_and_aggregate
+    input:
+      - type: IntermediateResult
+        name: filepath
+    output:
+      - type: IntermediateResult
+        name: filepath
+
+  'analyze_column':
+    command:
+      capture: marked
+      args:
+        - analyze_column
+    input:
+      - type: IntermediateResult
+        name: filepath
+    output:
+      - type: IntermediateResult
+        name: filepath
+
+  'handle_missing_values':
+    command:
+      capture: marked
+      args:
+        - handle_missing_values
+    input:
+      - type: IntermediateResult
+        name: filepath
+    output:
+      - type: IntermediateResult
+        name: filepath
+
+  'combine_dataframes':
+    command:
+      capture: marked
+      args:
+        - combine_dataframes
+    input:
+      - type: IntermediateResult
+        name: filepath
+    output:
+      - type: IntermediateResult
+        name: filepath

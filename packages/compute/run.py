@@ -9,7 +9,8 @@ import json
 import yaml
 
 from preprocess import (clean, create_vectors, generate_bigrams,
-                        remove_stopwords, tokenize, filter_dataframe)
+                        remove_stopwords, tokenize, filter_dataframe, group_and_aggregate, 
+                        analyze_column, handle_missing_values, combine_dataframes)
 
 
 def run_dataset_action(cmd: str, filepath: str):
@@ -30,6 +31,10 @@ def run_dataset_action(cmd: str, filepath: str):
         "remove_stopwords": remove_stopwords,
         "generate_bigrams": generate_bigrams,
         "filter_dataframe": filter_dataframe,
+        "group_and_aggregate": group_and_aggregate,
+        "analyze_column": analyze_column,
+        "handle_missing_values": handle_missing_values,
+        "combine_dataframes": combine_dataframes,
     }[cmd](filepath)
 
 
