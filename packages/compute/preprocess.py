@@ -262,23 +262,15 @@ def filter_dataframe(dataset_path: str) -> str:
     -------
     `str` The path to the filtered version of the dataset.
     """
-    print("In filter_dataframe")
-
     dataset_path = f"{dataset_path}/california_housing_test.csv"
     # Load the dataset
     df = pd.read_csv(dataset_path)
 
-    print("Done Reading csv")
-
     # Apply filtering
     filtered_df = df[df['median_income'] > 5]
 
-    print("Done filtering")
-
     # Save the filtered dataset to a new file
-    filtered_path = "/result/filtered_dataset.csv"
+    filtered_path = f"{dataset_path}/filtered_dataset.csv"
     filtered_df.to_csv(filtered_path)
-
-    print("Done writing")
     
     return filtered_path
