@@ -39,7 +39,7 @@ actions:
     command:
       capture: marked
       args:
-        - clean
+        - clean1
     input:
       - type: IntermediateResult
         name: filepath

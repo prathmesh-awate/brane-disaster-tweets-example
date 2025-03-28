@@ -16,7 +16,7 @@ import visualization;
 {
     //////// PREPROCESSING ////////
     println("Cleaning dataset...");
-    let train_clean := clean(new Data{ name := "nlp_train" });
+    let train_clean := clean1(new Data{ name := "nlp_train" });
     // let test_clean  := clean(new Data{ name := "nlp_test" });
 
     //println("Tokenizing dataset...");

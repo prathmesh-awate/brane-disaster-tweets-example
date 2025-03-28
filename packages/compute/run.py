@@ -8,7 +8,7 @@ import sys
 import json
 import yaml
 
-from preprocess import (clean, create_vectors, generate_bigrams,
+from preprocess import (clean1, create_vectors, generate_bigrams,
                         remove_stopwords, tokenize, load_csv, filter_data)
 
 
@@ -25,7 +25,7 @@ def run_dataset_action(cmd: str, filepath: str):
     The dataset filepath in the DFS.
     """
     return {
-        "clean": clean,
+        "clean": clean1,
         "tokenize": tokenize,
         "remove_stopwords": remove_stopwords,
         "generate_bigrams": generate_bigrams,
