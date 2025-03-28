@@ -76,8 +76,7 @@ def main():
     filepath_in = json.loads(os.environ["FILEPATH"])
     print("filepath_in: ", filepath_in)
     filepath_out = run_dataset_action(command, filepath_in)
-    print_output({"filepath": filepath_out})
-    filepath_out = run_dataset_action(command, filepath_in)
+    # print_output({"filepath": filepath_out})
 
 
 
